@@ -1,15 +1,16 @@
+require 'aws-sdk-cloudsearchdomain'
+
 module Embulk
   module Output
 
     class AmazonCloudsearch < OutputPlugin
       Plugin.register_output("amazon_cloudsearch", self)
 
+
       def self.transaction(config, schema, count, &control)
         # configuration code:
         task = {
-          "option1" => config.param("option1", :integer),                     # integer, required
-          "option2" => config.param("option2", :string, default: "myvalue"),  # string, optional
-          "option3" => config.param("option3", :string, default: nil),        # string, optional
+          'endpoint' => config.param('endpoint', :string)
         }
 
         # resumable output:
@@ -29,10 +30,7 @@ module Embulk
       # end
 
       def init
-        # initialization code:
-        @option1 = task["option1"]
-        @option2 = task["option2"]
-        @option3 = task["option3"]
+        @endpoint = task['endpoint']
       end
 
       def close
