@@ -1,3 +1,4 @@
+require 'json'
 require 'aws-sdk-cloudsearchdomain'
 
 module Embulk
@@ -47,18 +48,14 @@ module Embulk
         page.each do |record|
           hash = Hash[schema.names.zip(record)]
 
-          fields = @upload_columns.map {|c| %["#{c}": "#{hash[c]}"] }
-
           client.upload_documents(
-            documents: <<~JSON,
-              [
-                {
-                  "type": "add",
-                  "id": "#{hash[@id_column]}",
-                  "fields": { #{fields.join(",")} }
-                }
-              ]
-            JSON
+            documents: [
+              {
+                type: "add",
+                id: hash[@id_column].to_s,
+                fields: @upload_columns.inject({}) {|acc, c| acc[c] = hash[c]; acc }
+              }
+            ].to_json,
             content_type: 'application/json'
           )
         end
