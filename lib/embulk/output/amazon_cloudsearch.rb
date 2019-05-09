@@ -10,7 +10,10 @@ module Embulk
       def self.transaction(config, schema, count, &control)
         # configuration code:
         task = {
-          'endpoint' => config.param('endpoint', :string)
+          'endpoint' => config.param('endpoint', :string),
+          'id_column' => config.param('id_column', :string),
+          'upload_columns' => config.param('upload_columns', :array),
+          'stub_response' => config.param('stub_response', :bool, default: false)
         }
 
         # resumable output:
@@ -31,6 +34,9 @@ module Embulk
 
       def init
         @endpoint = task['endpoint']
+        @id_column = task['id_column']
+        @upload_columns = task['upload_columns']
+        @stub_response = task['stub_response']
       end
 
       def close
@@ -39,7 +45,22 @@ module Embulk
       def add(page)
         # output code:
         page.each do |record|
-          #hash = Hash[schema.names.zip(record)]
+          hash = Hash[schema.names.zip(record)]
+
+          fields = @upload_columns.map {|c| %["#{c}": "#{hash[c]}"] }
+
+          client.upload_documents(
+            documents: <<~JSON,
+              [
+                {
+                  "type": "add",
+                  "id": "#{hash[@id_column]}",
+                  "fields": { #{fields.join(",")} }
+                }
+              ]
+            JSON
+            content_type: 'application/json'
+          )
         end
       end
 
@@ -53,7 +74,11 @@ module Embulk
         task_report = {}
         return task_report
       end
-    end
 
+      private
+      def client
+        @_client ||= c = Aws::CloudSearchDomain::Client.new(endpoint: @endpoint, stub_responses: @stub_response)
+      end
+    end
   end
 end
