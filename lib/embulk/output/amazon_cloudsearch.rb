@@ -48,7 +48,7 @@ module Embulk
         page.each do |record|
           hash = Hash[schema.names.zip(record)]
 
-          client.upload_documents(
+          res = client.upload_documents(
             documents: [
               {
                 type: "add",
@@ -58,6 +58,14 @@ module Embulk
             ].to_json,
             content_type: 'application/json'
           )
+          Embulk.logger.debug { "embulk-output-amazon_cloudsearch: response #{res}" }
+
+          unless res.status == 'success'
+            Embulk.logger.error { "embulk-output-amazon_cloudsearch: data #{hash}, response #{res}" }
+          end
+          if res.warnings
+            Embulk.logger.warn { "embulk-output-amazon_cloudsearch: response #{res}" }
+          end
         end
       end
 
