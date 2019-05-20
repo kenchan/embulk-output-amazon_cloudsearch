@@ -6,7 +6,7 @@ Gem::Specification.new do |spec|
   spec.description   = "Dumps records to Amazon Cloudsearch."
   spec.email         = ["kenichi.taka@gmail.com"]
   spec.licenses      = ["MIT"]
-  # TODO set this: spec.homepage      = "https://github.com/kenichi.taka/embulk-output-amazon_cloudsearch"
+  spec.homepage      = "https://github.com/kenchan/embulk-output-amazon_cloudsearch"
 
   spec.files         = `git ls-files`.split("\n") + Dir["classpath/*.jar"]
   spec.test_files    = spec.files.grep(%r{^(test|spec)/})
