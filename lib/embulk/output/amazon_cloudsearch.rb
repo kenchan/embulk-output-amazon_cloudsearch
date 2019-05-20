@@ -54,7 +54,10 @@ module Embulk
             {
               type: "add",
               id: hash[@id_column].to_s,
-              fields: @upload_columns.inject({}) {|acc, c| acc[c] = hash[c]; acc }
+              fields: @upload_columns.inject({}) {|acc, c|
+                acc[c] = hash[c] if hash[c]
+                acc
+              }
             }
           end
 
