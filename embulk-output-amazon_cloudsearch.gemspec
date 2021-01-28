@@ -13,7 +13,8 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency 'aws-sdk-cloudsearchdomain', ['~> 1.9']
+  spec.add_dependency 'jar-dependencies'
   spec.add_development_dependency 'embulk', ['>= 0.8.39']
-  spec.add_development_dependency 'bundler', ['>= 1.10.6']
-  spec.add_development_dependency 'rake', ['>= 10.0']
+  spec.add_development_dependency 'bundler'
+  spec.add_development_dependency 'rake'
 end
